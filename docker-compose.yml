@@ -4,7 +4,7 @@
     jupyter:
       build:
         context: .
-        dockerfile: ./Docker file
+        dockerfile: ./Dockerfile
       container_name: jupyter_docker_assignment_3
       ports:
         - "8888:8888"
