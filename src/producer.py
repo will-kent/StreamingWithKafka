@@ -40,26 +40,58 @@ def producer_submissions(subreddit, broker_name):
     producer = create_producer(bootstrap_broker=broker_name)
 
     for submission in subreddit.stream.submissions():
-        str_submission = str(vars(submission))
-        json_submission = json.dumps(str_submission)
-        data = json.loads(json_submission)
-        producer.produce("submission", key=submission.id, value=data, callback=acknowledged)
+        # Create Submissions JSON and produce as submissions topic
+        data = {}
+        data['author_fullname'] = submission.author_fullname
+        data['title'] = submission.title
+        data['subreddit_name_prefixed'] = submission.subreddit_name_prefixed
+        data['name'] = submission.name
+        data['upvote_ratio'] = submission.upvote_ratio
+        data['ups'] = submission.ups
+        data['score'] = submission.score
+        data['author_premium'] = submission.author_premium
+        data['created'] = submission.created
+        data['domain'] = submission.domain
+        data['url_overridden_by_dest'] = submission.url_overridden_by_dest
+        data['over_18'] = submission.over_18
+        data['subreddit_id'] = submission.subreddit_id
+        data['permalink'] = submission.permalink
+        data['parent_whitelist_status'] = submission.parent_whitelist_status
+        data['url'] = submission.url
+        data['created_utc'] = submission.created_utc
+        dump_submission = json.dumps(data)
+        try:
+            producer.produce("submissions", key=submission.id, value=dump_submission, callback=acknowledged)
+        except Exception as e:
+            logging.error(e)
 
 
 def producer_comments(subreddit, broker_name):
+    # Create Comments JSON and produce as comments topic
     producer = create_producer(bootstrap_broker=broker_name)
 
     for comment in subreddit.stream.comments():
-        str_comment = str(vars(comment))
-        json_comment = json.dumps(str_comment)
-        data = json.loads(json_comment)
+        data = {}
+        data['id'] = comment.id
+        data['subreddit_id'] = comment.subreddit_id
+        data['body'] = comment.body
+        data['link_title'] = comment.link_title
+        data['name'] = comment.name
+        data['permalink'] = comment.permalink
+        data['link_permalink'] = comment.link_permalink
+        data['link_author'] = comment.link_author
+        data['link_url'] = comment.link_url
+        data['created'] = comment.created
+        data['ups'] = comment.ups
+        dump_comment = json.dumps(data)
         try:
-            producer.produce("comments", key=comment.id, value=data, callback=acknowledged)
-        except:
-            print("failure")
+            producer.produce("comments", key=comment.id, value=dump_comment, callback=acknowledged)
+        except Exception as e:
+            logging.error(e)
 
 
 def run_in_parallel(*fns, subreddit, broker_name):
+    # Run functions in parallel
     proc = []
     for fn in fns:
         msg = "Starting function {}".format(fn)
