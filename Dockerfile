@@ -5,7 +5,8 @@ RUN pip install pandas==1.2.2 \
     && pip install confluent-kafka==1.6.1 \
     && pip install Faker==7.0.1 \
     && pip install sseclient==0.0.27 \
-    && pip install praw==7.2.0
+    && pip install praw==7.2.0 \
+    && pip install configparser==5.0.1
 
 ENV PYTHONPATH "${PYTHONPATH}:/home/jovyan/work"
 

@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Passwords and Secrets
+src/configuration/config.cfg
+*.crt
