@@ -1,14 +1,16 @@
 import configparser
-import praw
 from confluent_kafka import Producer
-import socket
 import json
-from multiprocessing import Process
 import logging
+from multiprocessing import Process
+import os
+import praw
+import socket
 
 # Read passwords and secrets from config file
 config_parser = configparser.ConfigParser()
-config_parser.read("configuration/config.cfg")
+config_path = os.path.join(os.path.dirname(__file__), "configuration/config.cfg")
+config_parser.read(config_path)
 
 # Set parameters
 reddit_client_id = config_parser["praw"]["client_id"]
@@ -42,6 +44,7 @@ def producer_submissions(subreddit, broker_name):
     for submission in subreddit.stream.submissions():
         # Create Submissions JSON and produce as submissions topic
         data = {}
+        data['id'] = submission.id
         data['author_fullname'] = submission.author_fullname
         data['title'] = submission.title
         data['subreddit_name_prefixed'] = submission.subreddit_name_prefixed
@@ -75,12 +78,14 @@ def producer_comments(subreddit, broker_name):
         data['id'] = comment.id
         data['subreddit_id'] = comment.subreddit_id
         data['body'] = comment.body
+        data['link_id'] = comment.link_id
         data['link_title'] = comment.link_title
         data['name'] = comment.name
         data['permalink'] = comment.permalink
         data['link_permalink'] = comment.link_permalink
         data['link_author'] = comment.link_author
         data['link_url'] = comment.link_url
+        data['is_submitter'] = comment.is_submitter
         data['created'] = comment.created
         data['ups'] = comment.ups
         dump_comment = json.dumps(data)
