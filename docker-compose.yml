@@ -6,6 +6,8 @@
         context: .
         dockerfile: ./Dockerfile
       container_name: jupyter_docker_assignment_3
+      depends_on:
+        - broker
       ports:
         - "8888:8888"
       environment:
@@ -24,7 +26,26 @@
       environment:
         ZOOKEEPER_CLIENT_PORT: 2181
         ZOOKEEPER_TICK_TIME: 2000
-  
+
+    kafka-setup:
+      image: confluentinc/cp-kafka:6.1.1
+      hostname: kafka-setup
+      container_name: kafka-setup
+      depends_on:
+        - broker
+        - schema-registry
+      command: "bash -c 'echo Waiting for Kafka to be ready... && \
+                         cub kafka-ready -b broker:29092 1 20 && \
+                         kafka-topics --create --topic submissions --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
+                         kafka-topics --create --topic comments --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
+                         sleep infinity
+                         '"
+      environment:
+        # The following settings are listed here only to satisfy the image's requirements.
+        # We override the image's `command` anyways, hence this container will not start a broker.
+        KAFKA_BROKER_ID: ignored
+        KAFKA_ZOOKEEPER_CONNECT: ignored
+
     broker:
       image: confluentinc/cp-server:6.1.1
       hostname: broker
@@ -128,6 +149,7 @@
       depends_on:
         - broker
         - connect
+        - kafka-setup
       ports:
         - "8088:8088"
       environment:
@@ -143,6 +165,9 @@
         KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: 1
         KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: 'true'
         KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
+        # KSQL_KSQL_QUERIES_FILE: /home/jovyan/work/ksqldb/create_stream_submissions.sql
+      volumes:
+          - ./:/home/jovyan/work
   
     ksqldb-cli:
       image: confluentinc/cp-ksqldb-cli:6.1.1

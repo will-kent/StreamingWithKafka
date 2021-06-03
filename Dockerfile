@@ -13,3 +13,5 @@ ENV PYTHONPATH "${PYTHONPATH}:/home/jovyan/work"
 RUN echo "export PYTHONPATH=/home/jovyan/work" >> ~/.bashrc
 
 WORKDIR /home/jovyan/work
+
+CMD ["python", "/home/jovyan/work/src/producer.py"]
