@@ -1,4 +1,6 @@
-CREATE STREAM BBC_SUBMISSIONS WITH (kafka_topic = 'bbc_submissions') AS
+SET 'auto.offset.reset' = 'earliest';
+
+CREATE STREAM BBC_SUBMISSIONS WITH (kafka_topic = 'submissions') AS
 SELECT ID
 	,AUTHOR_FULLNAME
     ,TITLE
