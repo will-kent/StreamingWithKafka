@@ -6,8 +6,6 @@
         context: .
         dockerfile: ./Dockerfile
       container_name: jupyter_docker_assignment_3
-      depends_on:
-        - broker
       ports:
         - "8888:8888"
       environment:
