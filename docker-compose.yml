@@ -25,25 +25,6 @@
         ZOOKEEPER_CLIENT_PORT: 2181
         ZOOKEEPER_TICK_TIME: 2000
 
-    kafka-setup:
-      image: confluentinc/cp-kafka:6.1.1
-      hostname: kafka-setup
-      container_name: kafka-setup
-      depends_on:
-        - broker
-        - schema-registry
-      command: "bash -c 'echo Waiting for Kafka to be ready... && \
-                         cub kafka-ready -b broker:29092 1 20 && \
-                         kafka-topics --create --topic submissions --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
-                         kafka-topics --create --topic comments --partitions 1 --replication-factor 1 --if-not-exists --zookeeper zookeeper:2181 && \
-                         sleep infinity
-                         '"
-      environment:
-        # The following settings are listed here only to satisfy the image's requirements.
-        # We override the image's `command` anyways, hence this container will not start a broker.
-        KAFKA_BROKER_ID: ignored
-        KAFKA_ZOOKEEPER_CONNECT: ignored
-
     broker:
       image: confluentinc/cp-server:6.1.1
       hostname: broker
@@ -147,7 +128,6 @@
       depends_on:
         - broker
         - connect
-        - kafka-setup
       ports:
         - "8088:8088"
       environment:
