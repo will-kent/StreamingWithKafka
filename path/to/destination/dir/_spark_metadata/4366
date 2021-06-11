@@ -1,0 +1,2 @@
+v1
+{"path":"file:///home/jovyan/work/path/to/destination/dir/part-00000-e6b001ac-8613-4063-a0c8-417a68360261-c000.snappy.parquet","size":8698,"isDir":false,"modificationTime":1623226298248,"blockReplication":1,"blockSize":33554432,"action":"add"}
