@@ -45,14 +45,16 @@ def producer_submissions(subreddit, broker_name):
         # Create Submissions JSON and produce as submissions topic
         data = {}
         data['id'] = submission.id
-        data['author_fullname'] = submission.author_fullname
+        if hasattr(submission, 'author_fullname'):
+            data['author_fullname'] = submission.author_fullname
         data['title'] = submission.title
         data['subreddit_name_prefixed'] = submission.subreddit_name_prefixed
         data['name'] = submission.name
         data['upvote_ratio'] = submission.upvote_ratio
         data['ups'] = submission.ups
         data['score'] = submission.score
-        data['author_premium'] = submission.author_premium
+        if hasattr(submission, 'author_premium'):
+            data['author_premium'] = submission.author_premium
         data['created'] = submission.created
         data['domain'] = submission.domain
         data['url_overridden_by_dest'] = submission.url_overridden_by_dest
